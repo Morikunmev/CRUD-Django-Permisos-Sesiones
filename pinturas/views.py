@@ -72,7 +72,18 @@ def cerrarSesion(request):
 
 
 def mostrarMenuAdmin(request):
-    return render(request, 'menu_admin.html')
+    estadoSesion = request.session.get("estadoSesion")
+    nomUsuario = request.session.get("nomUsuario")
+    if estadoSesion is True:
+        if nomUsuario.upper() == "ADMIN":
+            datos = {'nomUsuario':nomUsuario}
+            return render(request,'menu_admin.html',datos)
+        else:
+            datos = {'r2':'No tiene permisos suficientes para acceder !!'}
+            return render(request,'index.html',datos)
+    else:
+        datos = {'r2':'Debe iniciar sesión para acceder!!'}
+        return render(request,'index.html',datos)
 
 
 
@@ -167,7 +178,18 @@ def mostrarListarHistorial(request):
 
 
 def mostrarMenuUsuario(request):
-    return render(request, 'menu_usuario.html')
+    estadoSesion = request.session.get("estadoSesion")
+    nomUsuario = request.session.get("nomUsuario")
+    if estadoSesion is True:
+        if nomUsuario.upper() != "ADMIN":
+            datos = {'nomUsuario':nomUsuario}
+            return render(request,'menu_usuario.html',datos)
+        else:
+            datos = {'r2':'No tiene permisos suficientes para acceder !!'}
+            return render(request,'index.html',datos)
+    else:
+        datos = {'r2':'Debe iniciar sesión para acceder!!'}
+        return render(request,'index.html',datos)
 
 
 
