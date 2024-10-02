@@ -28,6 +28,17 @@ def iniciarSesion(request):
             request.session['idUsuario'] = comprobarLogin[0]['id']
             request.session['nomUsuario'] = nom.upper()
             datos = {'nomUsuario':nom.upper()}
+
+
+            #se registra en la tabla historial
+            descripcion = "Inicia Sesion"
+            tabla = ""
+            fechayhora = datetime.now()
+            usuario = request.session['idUsuario']
+            his = Historial(descripcion_historial=descripcion,tabla_afectada_historial=tabla,fecha_hora_historial=fechayhora,usuario_id=usuario)
+            his.save()
+
+
             if nom.upper() == "ADMIN":
                 return render(request,'menu_admin.html.',datos)
             else:
@@ -53,9 +64,19 @@ def iniciarSesion(request):
 
 def cerrarSesion(request):
     try:
+        #se registra en la tabla historial
+        descripcion = "Cierra Sesion"
+        tabla = ""
+        fechayhora = datetime.now()
+        usuario = request.session['idUsuario']
+        his = Historial(descripcion_historial=descripcion,tabla_afectada_historial=tabla,fecha_hora_historial=fechayhora,usuario_id=usuario)
+        his.save()
+
+        #se elimina los datos de la sesión
         del request.session['estadoSesion']
         del request.session['idUsuario']
         del request.session['nomUsuario']
+        
         return render(request, 'index.html')
     except:
         return render(request, 'index.html')
@@ -96,7 +117,21 @@ def mostrarMenuAdmin(request):
 
 
 def mostrarFormRegistrarEstilo(request):
-    pass
+    estadoSesion = request.session.get("estadoSesion")
+    nomUsuario = request.session.get("nomUsuario")
+
+    if estadoSesion is True:
+        if nomUsuario.upper() == "ADMIN":
+
+            est = Estilo.objects.all().values().order_by('nombre_estilo')
+            datos = {'nomUsuario':nomUsuario,'est':est}
+            return render(request,'form_registrar_estilos.html',datos)
+        else:
+            datos = {'r2':'No tiene permisos suficientes para acceder!!'}
+            return render(request,'index.html',datos)
+    else:
+        datos = {'r2':'Debe iniciar sesión para acceder!!'}
+        return render(request,'index.html',datos)
 
 
 

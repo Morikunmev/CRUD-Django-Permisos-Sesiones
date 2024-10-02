@@ -15,6 +15,6 @@ class Pintura(models.Model):
 
 class Historial(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE)
-    descripcion = models.TextField(max_length=200)
+    descripcion_historial = models.TextField(max_length=200)
     tabla_afectada_historial = models.TextField(max_length=100)
     fecha_hora_historial = models.DateTimeField()   
