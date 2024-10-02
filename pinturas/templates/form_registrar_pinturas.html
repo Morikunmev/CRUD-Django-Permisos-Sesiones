@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		
+		{% load static %}
+
+		<meta charset="UTF-8"/>
+		<title>Formulario de Pinturas</title>
+
+		<link rel="icon" href="{% static "imagenes/logoArte.png"%}"/>
+
+		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-0evHe/X+R7YkIZDRvuzKMRqM+OrBnVFBL6DOitfPri4tjfHxaWutUpFmBp4vmVor" crossorigin="anonymous"/>
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.9.1/font/bootstrap-icons.css"/>
+		
+		<script>
+            const botonCerrarSesion = () => {
+                if(window.confirm("¿Está Seguro De Querer Cerrar La Sesión?")){
+                    window.location.href = "/logout";
+                }
+            }
+        </script>
+
+	</head>
+<body>
+
+	<div class="container">
+		<nav class="navbar navbar-expand-lg bg-primary">
+			<div class="container-fluid">
+
+				<a href="/menu_usuario">
+					<img src="{% static "imagenes/logoArte.png"%}" width="50px" style="margin-right:10px;" alt="No Encontrada"/>
+				</a>
+
+				<span class="navbar-brand text-white">Usuario Logeado</span><span class="navbar-brand text-white">
+					{{ nomUsuario }}
+				</span>
+				
+				<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+					<span class="navbar-toggler-icon"></span>
+				</button>
+				<div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+					<div class="navbar-nav">
+						<a class="nav-link text-center text-white" href="/menu_usuario">Inicio</a>
+						<a class="nav-link text-center text-white" href="/form_registrar_pinturas">Formulario de Pinturas</a>
+						<a class="nav-link text-center text-white" href="/listar_pinturas">Listado de Pinturas</a>
+						<a class="nav-link text-center text-white" href="#" onClick="botonCerrarSesion()">Cerrar Sesión</a>					
+					</div>
+				</div>
+			</div>
+	  	</nav>
+		
+
+		
+	  
+
+		<div style="background-color:#0040A1; padding-top:10px; padding-bottom:10px;">
+		
+			<div style="width:80%; background-color:#fff; margin:auto;">
+				
+				<form action="" method="post">
+					{% csrf_token %}
+					<center>
+						<h1>Registro de Pinturas</h1>
+						<input class="form-control form-control-lg text-center" style="margin-bottom:10px; width:95%;"  type="text"  placeholder="Digite El Titulo"  name="txttit"  required/>
+						
+						<select name="cboest" class="form-select-lg text-center" style="margin-bottom:10px; width:95%;" required>
+							<option value="">Selecciones Estilo</option>
+							
+
+								<option value=""></option>
+							
+
+						</select>
+						
+						<input class="form-control form-control-lg text-center" style="margin-bottom:10px; width:95%;"  type="number" min="1" max="100000000"  placeholder="Digite El Precio"  name="txtpre"  required/>
+						<input type="submit" class="btn btn-primary btn-lg"     style="width:95%;" value="Registrar Pintura"/>
+					</center>
+				</form>
+
+				<br/>
+			
+			</div>
+
+		</div>
+
+	</div>
+	
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
+	
+</body>
+</html>
