@@ -353,7 +353,27 @@ def eliminarEstilo(request, id):
 
 
 def mostrarListarHistorial(request):
-    pass
+    try:
+        estadoSesion = request.session.get("estadoSesion")
+        if estadoSesion is True:
+            nomUsuario = request.session.get('nomUsuario')
+            if nomUsuario == "ADMIN":
+                his = Historial.objects.select_related("usuario").all().order_by("-fecha_hora_historial")
+                datos = {'nomUsuario': request.session['nomUsuario'], 'his': his}
+                return render(request, 'listar_historial.html', datos)
+        
+            else:
+                datos = {'r2':'Debe tiene permisos suficientes para sesión para acceder!!'}
+                return render(request,'index.html',datos)
+        else:
+            datos= {'r2':'Debe iniciar sesion para acceder!!'}
+            return render(request,'index.html',datos)
+
+
+    except:
+        datos= {'r2':'Error al cargar la lista de historial!!'}
+        return render(request,'index.html',datos)
+
 
 
 
@@ -361,6 +381,9 @@ def mostrarListarHistorial(request):
 #--------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------
 #--------------------------------------------------------------------------------------------------------
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
+
 
 
 
@@ -414,8 +437,19 @@ def eliminarPintura(request, id):
 
 
 def mostrarFormRegistrarPinturas(request):
-    pass
+    estadoSesion = request.session.get('estadoSesion')
+    if estadoSesion is True:
+        if request.session["nomUsuario"].upper() != "ADMIN":
 
+            opcionesEstilos = Estilo.objects.all().values().order_by("nombre_estilo")
+            datos = {'nomUsuario': request.session['nomUsuario'], 'opcionesEstilos': opcionesEstilos}
+            return render(request,'form_registrar_pinturas.html',datos)
+        else:
+            datos = {'r2':'No tiene permisos suficientes para acceder!!'}
+            return render(request,'index.html',datos)
+    else:
+        datos = {'r2':'Debe iniciar sesión para acceder!!'}
+        return render(request,'index.html',datos)
 
 
 

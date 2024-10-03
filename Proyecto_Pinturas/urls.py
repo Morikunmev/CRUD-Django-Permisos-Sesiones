@@ -15,13 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
-
 from pinturas import views
+from django.shortcuts import render
+
+
+# Importa la vista personalizada para el error 404
+from django.conf.urls import handler404
+
+# Define tu vista personalizada
+def custom_404_view(request, exception):
+    return render(request, '404.html', status=404)
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    #path('admin/', admin.site.urls),
     path('', views.mostrarIndex, name='index'),
     path('login', views.iniciarSesion, name='login'),
     path('logout', views.cerrarSesion),
@@ -45,3 +52,4 @@ urlpatterns = [
     path('eliminar_pintura/<int:id>', views.eliminarPintura),
 
 ]
+handler404 = views.custom_404_view
