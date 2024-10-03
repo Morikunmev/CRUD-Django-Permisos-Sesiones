@@ -194,7 +194,43 @@ def registrarEstilo(request):
 #--------------------------------------------------------------------------------------------------------
 
 def mostrarFormActualizarEstilo(request, id):
-    pass
+    try:
+        estadoSesion = request.session.get("estadoSesion")
+        if estadoSesion is True:
+            nomUsuario = request.session.get('nomUsuario')
+            if nomUsuario == 'ADMIN':
+                encontrado = Estilo.objects.get(id=id)
+                est = Estilo.objects.all().values().order_by('nombre_estilo')
+                datos = {
+                    'nomUsuario': request.session["nomUsuario"],
+                    'est': est,
+                    'encontrado': encontrado}
+                return render(request, 'form_actualizar_estilos.html', datos)   
+
+            else:
+                est = Estilo.objects.all().values().order_by('nombre_estilo')
+                datos = {
+                    'nomUsuario': request.session["nomUsuario"],
+                    'est': est,
+                    'r2': 'No tiene permisos suficientes para realizar la accion!!'}
+                return render(request, 'form_registar_estilos.html', datos)
+        else:
+            est = Estilo.objects.all().values().order_by('nombre_estilo')
+            datos = {
+                    'nomUsuario': request.session["nomUsuario"],
+                    'est': est,
+                    'r2': 'Debe inicar sesion para acceder!!'}
+            return render(request, 'index', datos)
+    except:
+        est = Estilo.objects.all().values().order_by("nombre_estilo")
+        datos = {
+            'nomUsuario': request.session["nomUsuario"],
+            'est': est,
+            'r2': 'El ID (' + str(id) + ') No Existe. Imposible Actualizar!!'
+        }
+        return render(request, 'form_registrar_estilos.html', datos)
+
+
 
 
 
@@ -207,7 +243,38 @@ def mostrarFormActualizarEstilo(request, id):
 
 
 def actualizarEstilo(request, id):
-    pass
+    try:
+        nom = request.POST["txtest"]
+
+        est = Estilo.objects.get(id=id)
+        est.nombre_estilo = nom
+        est.save()
+
+        # Se registra en la tabla historial
+        descripcion = "Actualizado realizada (" + str(nom.upper()) + ")"
+        tabla = "Estilo"
+        fechayhora = datetime.now()
+        usuario = request.session['idUsuario']
+        his = Historial(descripcion_historial=descripcion, tabla_afectada_historial=tabla, fecha_hora_historial=fechayhora, usuario_id=usuario)
+        his.save()
+
+        est = Estilo.objects.all().values().order_by('nombre_estilo')
+        datos = {
+            'nomUsuario': request.session["nomUsuario"],
+            'est': est,
+            'r': 'Estilo (' + str(nom.upper()) + ') Actualizado Correctamente!!'
+        }
+        return render(request, 'form_registrar_estilos.html', datos)
+
+    except:
+        est = Estilo.objects.all().values().order_by("nombre_estilo")
+        datos = {
+            'nomUsuario': request.session["nomUsuario"],
+            'est': est,
+            'r2': 'El ID (' + str(id) + ') No Existe. Imposible Actualizar!!'
+        }
+        return render(request, 'form_registrar_estilos.html', datos)
+
 
 
 
@@ -287,7 +354,6 @@ def eliminarEstilo(request, id):
 
 def mostrarListarHistorial(request):
     pass
-
 
 
 

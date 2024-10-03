@@ -61,11 +61,11 @@
         </nav>
         <div style="background-color:#0040A1; padding-top:10px; padding-bottom:10px;">
             <div style="width:80%; background-color:#fff; margin:auto;">
-                <form action="" method="post">
+                <form action="/actualizar_estilo/{{encontrado.id}}" method="post">
                     {% csrf_token %}
                     <center>
                         <h1>Actualización de Estilos</h1>
-                        <input value="" class="form-control form-control-lg text-center"
+                        <input value="{{encontrado.nombre_estilo}}" class="form-control form-control-lg text-center"
                             style="margin-bottom:10px; width:95%;" type="text" placeholder="Nombre del Estilo"
                             name="txtest" required />
                         <input type="submit" class="btn btn-primary btn-lg" style="width:95%;"
@@ -83,20 +83,22 @@
                         </tr>
                     </thead>
                     <tbody class="text-center">
+                        {% for x in est %}
                         <tr class="align-middle">
-                            <td></td>
-                            <td></td>
+                            <td>{{x.id}}</td>
+                            <td>{{x.nombre_estilo}}</td>
                             <td>
-                                <a href="" class="btn btn-lg">
+                                <a href="/form_actualizar_estilo/{{x.id}}" class="btn btn-lg">
                                     <i class="bi bi-pencil-fill"></i>
                                 </a>
                             </td>
                             <td>
-                                <button type="button" onClick="" class="btn btn-lg">
+								<button type="button" onClick="botonEliminarEstilo('{{x.id}}')" class="btn btn-lg">
                                     <i class="bi bi-trash-fill"></i>
                                 </button>
                             </td>
                         </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
             </div>
