@@ -138,23 +138,60 @@ def mostrarFormRegistrarEstilo(request):
 
 
 #--------------------------------------------------------------------------------------------------------
-
-
-
-
-
 def registrarEstilo(request):
-    pass
+    estadoSesion = request.session.get("estadoSesion")
+    nomUsuario = request.session.get("nomUsuario")
 
+    if estadoSesion is True:
+        if nomUsuario.upper() == "ADMIN":
+            if request.method == 'POST':
+                nom = request.POST["txtest"].upper()
+        
+                comprobarEstilo = Estilo.objects.filter(nombre_estilo=nom)
+                if comprobarEstilo:
+                    est= Estilo.objects.all().values().order_by('nombre_estilo')
+                    datos ={
+                        'nomUsuario': nomUsuario,
+                        'est': est,
+                        'r2': 'El Estilo (' + str(nom.upper()) + ') Ya existe!'
+                    }
+                    return render(request, 'form_registrar_estilos.html', datos)
+                else:
+                    est = Estilo(nombre_estilo=nom)
+                    est.save()
 
+                    # Se registra en la tabla historial
+                    descripcion = "Insert realizado (" + str(nom.upper()) + ")"
+                    tabla = "Estilo"
+                    fechayhora = datetime.now()
+                    usuario = request.session['idUsuario']
+                    his = Historial(descripcion_historial=descripcion, tabla_afectada_historial=tabla, fecha_hora_historial=fechayhora, usuario_id=usuario)
+                    his.save()
 
-
+                    est= Estilo.objects.all().values().order_by('nombre_estilo')
+                    datos = {
+                        'nomUsuario': nomUsuario,
+                        'est': est,
+                        'r': 'Estilo (' + str(nom.upper()) + ') Registrado Correctamente!!'
+                    }
+                    return render(request, 'form_registrar_estilos.html', datos)
+            else:
+                # Se ejecuta cuando en la URL se escribe 'registrar_estilo'
+                est= Estilo.objects.all().values().order_by('nombre_estilo')
+                datos = {
+                    'nomUsuario': nomUsuario,
+                    'est': est,
+                    'r2': 'Debe presionar El Boton para Registrar un Estilo!!'
+                }
+                return render(request, 'form_registrar_estilos.html', datos)
+        else:
+            datos = {'r2': 'No tiene permisos suficientes para acceder!!'}
+            return render(request, 'index.html', datos)
+    else:
+        datos = {'r2': 'Debe iniciar sesión para acceder!!'}
+        return render(request, 'index.html', datos)
 
 #--------------------------------------------------------------------------------------------------------
-
-
-
-
 
 def mostrarFormActualizarEstilo(request, id):
     pass
@@ -182,8 +219,59 @@ def actualizarEstilo(request, id):
 
 
 
+
 def eliminarEstilo(request, id):
-    pass
+    # Verificamos si el usuario ha iniciado sesión
+    estadoSesion = request.session.get("estadoSesion")
+    nomUsuario = request.session.get("nomUsuario")
+
+    if estadoSesion is True:
+        if nomUsuario.upper() == "ADMIN":
+            try:
+                # Obtenemos el estilo por ID
+                est = Estilo.objects.get(id=id)
+                nom = est.nombre_estilo
+                est.delete()
+
+                # Se registra en la tabla historial
+                descripcion = "Eliminado (" + str(nom.upper()) + ")"
+                tabla = "Estilo"
+                fechayhora = datetime.now()
+                usuario = request.session['idUsuario']
+                his = Historial(
+                    descripcion_historial=descripcion, 
+                    tabla_afectada_historial=tabla, 
+                    fecha_hora_historial=fechayhora, 
+                    usuario_id=usuario
+                )
+                his.save()
+
+                # Recargamos la lista de estilos para mostrarla nuevamente
+                est = Estilo.objects.all().values().order_by('nombre_estilo')
+                datos = {
+                    'nomUsuario': request.session['nomUsuario'],
+                    'est': est,
+                    'r': 'Estilo (' + str(nom.upper()) + ') Eliminado Correctamente!!'
+                }
+                return render(request, 'form_registrar_estilos.html', datos) 
+
+            except Estilo.DoesNotExist:
+                # Si el estilo no existe
+                est = Estilo.objects.all().values().order_by('nombre_estilo')
+                datos = {
+                    'nomUsuario': request.session['nomUsuario'],
+                    'est': est,
+                    'r2': 'El ID (' + str(id) + ') No Existe. Imposible Eliminar!!'
+                }
+                return render(request, 'form_registrar_estilos.html', datos)
+        else:
+            # Mensaje de permisos insuficientes si no es "ADMIN"
+            datos = {'r2': 'No tiene permisos suficientes para realizar esta acción!!'}
+            return render(request, 'index.html', datos)
+    else:
+        # Si no ha iniciado sesión
+        datos = {'r2': 'Debe iniciar sesión para acceder!!'}
+        return render(request, 'index.html', datos)
 
 
 
@@ -225,9 +313,6 @@ def mostrarMenuUsuario(request):
     else:
         datos = {'r2':'Debe iniciar sesión para acceder!!'}
         return render(request,'index.html',datos)
-
-
-
 
 
 #--------------------------------------------------------------------------------------------------------

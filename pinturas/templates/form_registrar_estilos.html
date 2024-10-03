@@ -21,9 +21,6 @@
 			}
 		}
 	</script>
-
-
-
 	<script>
 		const botonEliminarEstilo = (id) => {
 			if (window.confirm("¿Está Seguro(a) De Querer Eliminar El Registro?")) {
@@ -31,7 +28,6 @@
 			}
 		}
 	</script>
-
 </head>
 
 <body>
@@ -66,15 +62,25 @@
 			</div>
 		</nav>
 
-
-
-
+		{% if r %}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<h5>{{r}}</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endif %}
+		
+		{% if r2 %}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<h5>{{r2}}</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endif %}
 
 		<div style="background-color:#0040A1; padding-top:10px; padding-bottom:10px;">
 
 			<div style="width:80%; background-color:#fff; margin:auto;">
 
-				<form action="" method="post">
+				<form action="registrar_estilo" method="post">
 					{% csrf_token %}
 					<center>
 						<h1>Registro de Estilos</h1>
@@ -121,21 +127,24 @@
 				<h5 class="text-center text-danger" style="padding-top:10px; padding-bottom: 10px;">
 					No hay Estilos para listar!!
 				</h5>
-
-
 				{% endif %}
-
-
-
 			</div>
-
 		</div>
-
 	</div>
-
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js"
 		integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2"
 		crossorigin="anonymous"></script>
+
+	<script>
+		// Desvanecer alertas después de 3 segundos (3000 milisegundos)
+		setTimeout(function () {
+			var alerts = document.querySelectorAll('.alert');
+			alerts.forEach(function (alert) {
+				var fadeOut = new bootstrap.Alert(alert);
+				fadeOut.close(); // Cierra el mensaje
+			});
+		}, 2000);
+	</script>
 
 </body>
 
