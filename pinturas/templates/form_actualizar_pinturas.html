@@ -53,22 +53,25 @@
 		
 			<div style="width:80%; background-color:#fff; margin:auto;">
 				
-				<form action="" method="post">
+				<form action="/actualizar_pintura/{{encontrado.id}}" method="post">
 					{% csrf_token %}
 					<center>
 						<h1>Actualización de Pintura</h1>
-						<input value="" class="form-control form-control-lg text-center" style="margin-bottom:10px; width:95%;"  type="text"  placeholder="Digite El Titulo"  name="txttit" required/>
+						<input value="{{encontrado.titulo_pintura}}" class="form-control form-control-lg text-center" style="margin-bottom:10px; width:95%;"  type="text"  placeholder="Digite El Titulo"  name="txttit" required/>
 						
 						<select name="cboest" class="form-select-lg text-center" style="margin-bottom:10px; width:95%;" required>
 							<option value="">Selecciones Estilo</option>
+								{% for x in opcionesEstilos %}
+									{% if encontrado.estilo_id == x.id %}
+										<option value="{{x.id}}" selected>{{x.nombre_estilo}}</option>
+									{% else %}
+									    <option value="{{x.id}}">{{x.nombre_estilo}}</option>
+									{% endif %} 
+								{% endfor %}
 							
-
-									<option value=""></option>
-								
-
 						</select>
 						
-						<input value="" class="form-control form-control-lg text-center" style="margin-bottom:10px; width:95%;"  type="number" min="1" max="100000000"  placeholder="Digite El Precio"  name="txtpre"  required/>
+						<input value="{{encontrado.precio_pintura}}" class="form-control form-control-lg text-center" style="margin-bottom:10px; width:95%;"  type="number" min="1" max="100000000"  placeholder="Digite El Precio"  name="txtpre"  required/>
 						<input type="submit" class="btn btn-primary btn-lg"     style="width:95%;" value="Guardar Cambios"/>
 					</center>
 				</form>

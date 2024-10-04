@@ -439,36 +439,57 @@ def mostrarListarPinturas(request):
 
 
 def eliminarPintura(request, id):
-    try:
-        pin = Pintura.objects.get(id=id)
-        tit = pin.titulo_pintura
-        pin.delete()
+    # Verificación del estado de la sesión
+    estadoSesion = request.session.get('estadoSesion')
+    if estadoSesion is True:
+        if request.session["nomUsuario"] != "ADMIN":
+            try:
+                # Lógica de eliminación de la pintura
+                pin = Pintura.objects.get(id=id)
+                tit = pin.titulo_pintura
+                pin.delete()
 
-        #Se registra en la tabla historial
-        descripcion = "Eliminacion realizada (" + str(tit.upper()) + ")"
-        tabla = "Pintura"
-        fechayhora = datetime.now()
-        usuario = request.session['idUsuario']
-        his = Historial(descripcion_historial=descripcion, tabla_afectada_historial=tabla, fecha_hora_historial=fechayhora, usuario_id=usuario)
-        his.save()
+                # Se registra en la tabla historial
+                descripcion = "Eliminacion realizada (" + str(tit.upper()) + ")"
+                tabla = "Pintura"
+                fechayhora = datetime.now()
+                usuario = request.session['idUsuario']
+                his = Historial(
+                    descripcion_historial=descripcion, 
+                    tabla_afectada_historial=tabla, 
+                    fecha_hora_historial=fechayhora, 
+                    usuario_id=usuario
+                )
+                his.save()
 
-        pin = Pintura.objects.select_related('estilo').all().order_by('titulo_pintura')
-        datos = {
-            'nomUsuario': request.session['nomUsuario'],
-            'pin': pin,
-            'r': 'Pintura (' + str(tit.upper()) + ') Eliminada Correctamente!!'
-        }
-        return render(request,'listar_pinturas.html',datos)
+                pin = Pintura.objects.select_related('estilo').all().order_by('titulo_pintura')
+                datos = {
+                    'nomUsuario': request.session['nomUsuario'],
+                    'pin': pin,
+                    'r': 'Pintura (' + str(tit.upper()) + ') Eliminada Correctamente!!'
+                }
+                return render(request, 'listar_pinturas.html', datos)
 
-    except:
-        pin = Pintura.objects.select_related('estilo').all().order_by('titulo_pintura')
-        datos = {
-            'nomUsuario': request.session['nomUsuario'],
-            'pin': pin,
-            'r2': 'El ID (' + str(id) + ') No Existe. Imposible Eliminar!!'
-        }
+            except Pintura.DoesNotExist:
+                # Si no existe la pintura con el ID proporcionado
+                pin = Pintura.objects.select_related('estilo').all().order_by('titulo_pintura')
+                datos = {
+                    'nomUsuario': request.session['nomUsuario'],
+                    'pin': pin,
+                    'r2': 'El ID (' + str(id) + ') No Existe. Imposible Eliminar!!'
+                }
+                return render(request, 'listar_pinturas.html', datos)
 
-        return render(request,'listar_pinturas.html',datos)
+        else:
+            # Si el usuario no tiene permisos de administrador
+            datos = {'r2': 'No tiene permisos suficientes para realizar esta acción!!'}
+            return render(request, 'index.html', datos)
+    
+    else:
+        # Si el usuario no ha iniciado sesión
+        datos = {'r2': 'Debe iniciar sesión para realizar esta acción!!'}
+        return render(request, 'index.html', datos)
+
 
 
 
@@ -577,7 +598,32 @@ def registrarPintura(request):
 
 
 def mostrarFormActualizarPintura(request, id):
-    pass
+    try:
+        estadoSesion = request.session.get('estadoSesion')
+        if estadoSesion is True:
+            if request.session["nomUsuario"] != "ADMIN":
+                encontrado = Pintura.objects.get(id=id)
+                opcionesEstilos = Estilo.objects.all().values().order_by("nombre_estilo")
+                datos = {'nomUsuario': request.session["nomUsuario"],
+                         'encontrado': encontrado,
+                         'opcionesEstilos': opcionesEstilos}
+                return render(request, 'form_actualizar_pinturas.html',datos)
+            else:
+                datos = {'r2': 'No tiene permisos suficientes para acceder!!'}
+                return render(request, 'index.html', datos)
+        else:
+            datos = {'r2': 'Debe iniciar sesión para acceder!!'}
+            return render(request, 'index.html', datos)
+
+
+    except:
+        pin = Pintura.objects.select_related('estilo').all().order_by("titulo_pintura")
+        datos = {
+            'nomUsuario': request.session['nomUsuario'],
+            'pin': pin,
+            'r2': 'No se encontró la pintura con el ID (' + str(id) + ')!!'
+        }
+        return render(request, 'listar_pinturas.html', datos)
 
 
 
@@ -590,7 +636,53 @@ def mostrarFormActualizarPintura(request, id):
 
 
 def actualizarPintura(request, id):
-    pass
+    try:
+        if request.method == "POST":
+            tit = request.POST["txttit"].upper()
+            est = request.POST["cboest"]
+            pre = request.POST["txtpre"]
+            pin = Pintura.objects.get(id=id)
+            pin.titulo_pintura = tit
+            pin.estilo_id = est
+            pin.precio_pintura=pre
+            pin.save()
+            # Registro en la tabla Historial
+            descripcion = "Actualización Realizada (" + str(tit) + ")"
+            tabla = "Pintura"
+            fechayhora = datetime.now()
+            usuario = request.session['idUsuario']
+            his = Historial(
+                descripcion_historial=descripcion,
+                tabla_afectada_historial=tabla,
+                fecha_hora_historial=fechayhora,
+                usuario_id=usuario
+            )
+            his.save()
+
+            pin = Pintura.objects.select_related('estilo').all().order_by('titulo_pintura')
+            datos = {
+                'nomUsuario': request.session['nomUsuario'],
+                'pin': pin,
+                'r': 'Pintura (' + str(tit) + ') actualizada correctamente!!'
+            }
+            return render(request, 'listar_pinturas.html', datos)
+        else:
+            # Si no se envió el formulario por POST
+            pin = Pintura.objects.select_related('estilo').all().order_by('titulo_pintura')
+            datos = {
+                'nomUsuario': request.session['nomUsuario'],
+                'encontrado': pin,
+                'r2': 'El ID (' + str(id) + ') No Existe. Imposible Actualizar!!!'}
+            return render(request, 'listar_pinturas.html', datos)
+    except:
+        pin = Pintura.objects.select_related('estilo').all().order_by('titulo_pintura')
+        datos ={
+            'nomUsuario':request.session['nomUsuario'],
+            'pin':pin,
+            'r2': 'No se pudo actualizar la pintura con el ID (' + str(id) + ')!!'
+        }
+        return render(request, 'listar_pinturas', datos)
+
 
 
 
