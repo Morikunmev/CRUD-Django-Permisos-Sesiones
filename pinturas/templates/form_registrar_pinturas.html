@@ -56,11 +56,26 @@
 				</div>
 			</div>
 		</nav>
+
+		{% if r %}
+		<div class="alert alert-success alert-dismissible fade show" role="alert">
+			<h5>{{r}}</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endif %}
+
+		{% if r2 %}
+		<div class="alert alert-danger alert-dismissible fade show" role="alert">
+			<h5>{{r2}}</h5>
+			<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+		</div>
+		{% endif %}
+
 		<div style="background-color:#0040A1; padding-top:10px; padding-bottom:10px;">
 
 			<div style="width:80%; background-color:#fff; margin:auto;">
 
-				<form action="" method="post">
+				<form action="/registrar_pintura" method="post">
 					{% csrf_token %}
 					<center>
 						<h1>Registro de Pinturas</h1>
@@ -75,10 +90,7 @@
 							<option value="{{x.id}}">{{x.nombre_estilo}}</option>
 
 							{% endfor %}
-
-
 						</select>
-
 						<input class="form-control form-control-lg text-center" style="margin-bottom:10px; width:95%;"
 							type="number" min="1" max="100000000" placeholder="Digite El Precio" name="txtpre"
 							required />
