@@ -40,7 +40,7 @@ def iniciarSesion(request):
 
 
             if nom.upper() == "ADMIN":
-                return render(request,'menu_admin.html.',datos)
+                return render(request,'menu_admin.html',datos)
             else:
                 return render(request, 'menu_usuario.html', datos)
             
